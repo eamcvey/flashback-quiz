@@ -72,8 +72,8 @@ export default function Home() {
     }, []);
 
     const handleScroll = useCallback((touch: { clientY: number }) => {
-        const SCROLL_THRESHOLD = 150; // pixels from edge to start scrolling
-        const SCROLL_SPEED = 10;
+        const SCROLL_THRESHOLD = 200; // Increased threshold for earlier scroll activation
+        const MAX_SCROLL_SPEED = 15;
         const windowHeight = window.innerHeight;
         const scrollY = window.scrollY;
         const maxScroll = document.documentElement.scrollHeight - windowHeight;
@@ -82,22 +82,36 @@ export default function Home() {
             clearInterval(scrollIntervalRef.current);
         }
 
+        // Calculate scroll speed based on distance from edge
+        const getScrollSpeed = (distance: number) => {
+            const normalizedDistance = Math.min(distance / SCROLL_THRESHOLD, 1);
+            return Math.round(MAX_SCROLL_SPEED * (1 - normalizedDistance));
+        };
+
         if (touch.clientY < SCROLL_THRESHOLD && scrollY > 0) {
-            // Scroll up
+            // Scroll up - speed increases as you get closer to the top edge
+            const speed = getScrollSpeed(touch.clientY);
             scrollIntervalRef.current = setInterval(() => {
-                window.scrollBy(0, -SCROLL_SPEED);
+                window.scrollBy({
+                    top: -speed,
+                    behavior: 'auto'
+                });
                 if (window.scrollY <= 0) {
                     clearInterval(scrollIntervalRef.current!);
                 }
-            }, 16);
+            }, 8); // Increased frame rate for smoother scrolling
         } else if (touch.clientY > windowHeight - SCROLL_THRESHOLD && scrollY < maxScroll) {
-            // Scroll down
+            // Scroll down - speed increases as you get closer to the bottom edge
+            const speed = getScrollSpeed(windowHeight - touch.clientY);
             scrollIntervalRef.current = setInterval(() => {
-                window.scrollBy(0, SCROLL_SPEED);
+                window.scrollBy({
+                    top: speed,
+                    behavior: 'auto'
+                });
                 if (window.scrollY >= maxScroll) {
                     clearInterval(scrollIntervalRef.current!);
                 }
-            }, 16);
+            }, 8);
         }
     }, []);
 
@@ -111,7 +125,12 @@ export default function Home() {
         const deltaY = (touch.clientY - draggedPosition.current.y) +
             (window.scrollY - draggedPosition.current.scrollY);
 
-        currentEventRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+        // Add a subtle easing effect to the movement
+        requestAnimationFrame(() => {
+            if (currentEventRef.current) {
+                currentEventRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+            }
+        });
 
         // Handle scrolling
         handleScroll(touch);
