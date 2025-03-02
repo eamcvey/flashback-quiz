@@ -274,12 +274,15 @@ export default function Home() {
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg select-none font-outfit ${isDragging ? 'z-50 shadow-xl' : ''
+                        className={`bg-white p-4 rounded-lg shadow-md mb-4 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg select-none font-outfit ${isDragging ? 'z-50 shadow-xl' : ''
                             }`}
                         style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
                     >
                         <p className="text-lg text-center select-none text-stone-700">{currentEvent.description}</p>
                     </div>
+                    <p className="text-stone-500 font-outfit mb-8">
+                        Event {quizState.currentEventIndex + 1} of {quizState.events.length}
+                    </p>
                 </>
             )}
 
@@ -319,12 +322,6 @@ export default function Home() {
                         />
                     ))}
                 </div>
-            </div>
-
-            <div className="mt-8 text-center">
-                <p className="text-stone-500 font-outfit">
-                    Event {quizState.currentEventIndex + 1} of {quizState.events.length}
-                </p>
             </div>
         </div>
     );
