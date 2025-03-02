@@ -189,7 +189,6 @@ export default function Home() {
                         style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
                     >
                         <p className="text-lg text-center select-none">{currentEvent.description}</p>
-                        <p className="text-sm text-center mt-2 text-gray-600 select-none">({currentEvent.year})</p>
                     </div>
                 </>
             )}
