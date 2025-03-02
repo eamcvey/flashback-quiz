@@ -9,11 +9,13 @@ interface DroppedEventProps {
 export default function DroppedEvent({ event, isCorrect }: DroppedEventProps) {
     return (
         <div
-            className={`p-4 rounded-lg shadow-md mb-4 w-full transition-colors ${isCorrect ? 'border-2 border-green-500 bg-green-50' : 'border-2 border-red-500 bg-red-50'
+            className={`p-4 rounded-lg shadow-md mb-4 w-full transition-colors ${isCorrect
+                    ? 'border-2 border-emerald-600 bg-emerald-50/70'
+                    : 'border-2 border-rose-400 bg-rose-50/70'
                 }`}
         >
-            <p className="text-lg text-center font-outfit">{event.description}</p>
-            <p className="text-sm text-center mt-2 text-gray-600 font-outfit">({event.year})</p>
+            <p className="text-lg text-center font-outfit text-stone-700">{event.description}</p>
+            <p className="text-sm text-center mt-2 text-stone-500 font-outfit">({event.year})</p>
         </div>
     );
 } 

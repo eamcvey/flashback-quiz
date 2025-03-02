@@ -216,15 +216,15 @@ export default function Home() {
 
     if (quizState.isComplete) {
         return (
-            <div className="min-h-screen flex flex-col items-center p-4 bg-amber-50">
+            <div className="min-h-screen flex flex-col items-center p-4 bg-stone-100">
                 <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-md w-full mb-8">
-                    <h2 className="text-2xl font-bold mb-4 font-fredoka">Quiz Complete!</h2>
-                    <p className="text-lg mb-4 font-outfit">
+                    <h2 className="text-2xl font-bold mb-4 font-fredoka text-stone-800">Quiz Complete!</h2>
+                    <p className="text-lg mb-4 font-outfit text-stone-700">
                         You got {totalCorrect} out of {quizState.events.length} correct!
                     </p>
                     <button
                         onClick={shareResults}
-                        className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors font-outfit"
+                        className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-outfit"
                     >
                         Share Results
                     </button>
@@ -232,7 +232,7 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
                     <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4 text-center font-fredoka">Before Grandpa was born</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-center font-fredoka text-stone-800">Before Grandpa was born</h3>
                         <div className="space-y-4">
                             {droppedEvents.before.map((item) => (
                                 <DroppedEvent
@@ -245,7 +245,7 @@ export default function Home() {
                     </div>
 
                     <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4 text-center font-fredoka">In Grandpa's lifetime</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-center font-fredoka text-stone-800">In Grandpa's lifetime</h3>
                         <div className="space-y-4">
                             {droppedEvents.during.map((item) => (
                                 <DroppedEvent
@@ -262,12 +262,12 @@ export default function Home() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-amber-50">
-            <h1 className="text-3xl font-bold mb-8 text-center text-amber-900 font-fredoka">Grandpa's Birthday Flashback Quiz</h1>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-stone-100">
+            <h1 className="text-3xl font-bold mb-8 text-center text-stone-800 font-fredoka">Grandpa's Birthday Flashback Quiz</h1>
 
             {currentEvent && !quizState.answers[currentEvent.id] && (
                 <>
-                    <p className="text-lg text-center mb-4 text-amber-800 font-outfit">Drag this event into the correct Grandpa Era!</p>
+                    <p className="text-lg text-center mb-4 text-stone-700 font-outfit">Drag this event into the correct Grandpa Era!</p>
                     <div
                         ref={currentEventRef}
                         draggable
@@ -278,7 +278,7 @@ export default function Home() {
                             }`}
                         style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
                     >
-                        <p className="text-lg text-center select-none">{currentEvent.description}</p>
+                        <p className="text-lg text-center select-none text-stone-700">{currentEvent.description}</p>
                     </div>
                 </>
             )}
@@ -288,9 +288,9 @@ export default function Home() {
                     data-zone="before"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('before')}
-                    className={`border-4 ${activeDropZone === 'before' ? 'border-solid border-blue-500' : 'border-dashed'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
+                    className={`border-4 ${activeDropZone === 'before' ? 'border-solid border-emerald-600' : 'border-dashed border-stone-300'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
-                    <p className="text-center text-lg font-medium mb-4 font-fredoka">
+                    <p className="text-center text-lg font-medium mb-4 font-fredoka text-stone-800">
                         Before Grandpa was born
                     </p>
                     {droppedEvents.before.map((item) => (
@@ -306,9 +306,9 @@ export default function Home() {
                     data-zone="during"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('during')}
-                    className={`border-4 ${activeDropZone === 'during' ? 'border-solid border-blue-500' : 'border-dashed'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
+                    className={`border-4 ${activeDropZone === 'during' ? 'border-solid border-emerald-600' : 'border-dashed border-stone-300'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
-                    <p className="text-center text-lg font-medium mb-4 font-fredoka">
+                    <p className="text-center text-lg font-medium mb-4 font-fredoka text-stone-800">
                         In Grandpa's lifetime
                     </p>
                     {droppedEvents.during.map((item) => (
@@ -322,7 +322,7 @@ export default function Home() {
             </div>
 
             <div className="mt-8 text-center">
-                <p className="text-gray-600 font-outfit">
+                <p className="text-stone-500 font-outfit">
                     Event {quizState.currentEventIndex + 1} of {quizState.events.length}
                 </p>
             </div>
