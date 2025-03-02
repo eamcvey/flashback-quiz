@@ -26,6 +26,8 @@ export default function Home() {
     const draggedPosition = useRef<{ x: number; y: number; scrollY: number } | null>(null);
     const currentEventRef = useRef<HTMLDivElement>(null);
     const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const animationFrameRef = useRef<number | null>(null);
+    const lastScrollTime = useRef<number>(0);
     const [activeDropZone, setActiveDropZone] = useState<DropZone | null>(null);
 
     const currentEvent = quizState.events[quizState.currentEventIndex];
@@ -61,18 +63,12 @@ export default function Home() {
         setIsDragging(false);
     }, [currentEvent, droppedEvents, quizState]);
 
-    const handleTouchStart = useCallback((e: React.TouchEvent) => {
-        const touch = e.touches[0];
-        draggedPosition.current = {
-            x: touch.clientX,
-            y: touch.clientY,
-            scrollY: window.scrollY
-        };
-        setIsDragging(true);
-    }, []);
-
     const handleScroll = useCallback((touch: { clientY: number }) => {
-        const SCROLL_THRESHOLD = 200; // Increased threshold for earlier scroll activation
+        const now = Date.now();
+        if (now - lastScrollTime.current < 16) return; // Limit to ~60fps
+        lastScrollTime.current = now;
+
+        const SCROLL_THRESHOLD = 200;
         const MAX_SCROLL_SPEED = 15;
         const windowHeight = window.innerHeight;
         const scrollY = window.scrollY;
@@ -82,14 +78,13 @@ export default function Home() {
             clearInterval(scrollIntervalRef.current);
         }
 
-        // Calculate scroll speed based on distance from edge
         const getScrollSpeed = (distance: number) => {
             const normalizedDistance = Math.min(distance / SCROLL_THRESHOLD, 1);
-            return Math.round(MAX_SCROLL_SPEED * (1 - normalizedDistance));
+            // Add easing function for smoother acceleration
+            return Math.round(MAX_SCROLL_SPEED * (1 - Math.pow(normalizedDistance, 2)));
         };
 
         if (touch.clientY < SCROLL_THRESHOLD && scrollY > 0) {
-            // Scroll up - speed increases as you get closer to the top edge
             const speed = getScrollSpeed(touch.clientY);
             scrollIntervalRef.current = setInterval(() => {
                 window.scrollBy({
@@ -99,9 +94,8 @@ export default function Home() {
                 if (window.scrollY <= 0) {
                     clearInterval(scrollIntervalRef.current!);
                 }
-            }, 8); // Increased frame rate for smoother scrolling
+            }, 16);
         } else if (touch.clientY > windowHeight - SCROLL_THRESHOLD && scrollY < maxScroll) {
-            // Scroll down - speed increases as you get closer to the bottom edge
             const speed = getScrollSpeed(windowHeight - touch.clientY);
             scrollIntervalRef.current = setInterval(() => {
                 window.scrollBy({
@@ -111,7 +105,7 @@ export default function Home() {
                 if (window.scrollY >= maxScroll) {
                     clearInterval(scrollIntervalRef.current!);
                 }
-            }, 8);
+            }, 16);
         }
     }, []);
 
@@ -125,11 +119,17 @@ export default function Home() {
         const deltaY = (touch.clientY - draggedPosition.current.y) +
             (window.scrollY - draggedPosition.current.scrollY);
 
-        // Add a subtle easing effect to the movement
-        requestAnimationFrame(() => {
+        // Cancel any existing animation frame
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
+        }
+
+        // Schedule the transform update
+        animationFrameRef.current = requestAnimationFrame(() => {
             if (currentEventRef.current) {
-                currentEventRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+                currentEventRef.current.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
             }
+            animationFrameRef.current = null;
         });
 
         // Handle scrolling
@@ -140,29 +140,56 @@ export default function Home() {
         const beforeZone = elements.find(el => el.getAttribute('data-zone') === 'before');
         const duringZone = elements.find(el => el.getAttribute('data-zone') === 'during');
 
-        if (beforeZone) {
-            setActiveDropZone('before');
-        } else if (duringZone) {
-            setActiveDropZone('during');
-        } else {
-            setActiveDropZone(null);
-        }
+        setActiveDropZone(beforeZone ? 'before' : duringZone ? 'during' : null);
     }, [isDragging, handleScroll]);
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        draggedPosition.current = {
+            x: touch.clientX,
+            y: touch.clientY,
+            scrollY: window.scrollY
+        };
+        setIsDragging(true);
+    }, []);
+
+    // Clean up animations and intervals on unmount
+    useEffect(() => {
+        return () => {
+            if (scrollIntervalRef.current) {
+                clearInterval(scrollIntervalRef.current);
+            }
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, []);
 
     const handleTouchEnd = useCallback((e: React.TouchEvent) => {
         if (!isDragging || !currentEventRef.current) return;
         e.preventDefault();
 
-        // Clear scroll interval if it exists
+        // Clear all animations and intervals
         if (scrollIntervalRef.current) {
             clearInterval(scrollIntervalRef.current);
+        }
+        if (animationFrameRef.current) {
+            cancelAnimationFrame(animationFrameRef.current);
         }
 
         const touch = e.changedTouches[0];
         const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
 
-        // Reset the transform
+        // Reset the transform with a transition for smooth return
+        currentEventRef.current.style.transition = 'transform 0.2s ease-out';
         currentEventRef.current.style.transform = '';
+
+        // Remove the transition after it completes
+        setTimeout(() => {
+            if (currentEventRef.current) {
+                currentEventRef.current.style.transition = '';
+            }
+        }, 200);
 
         // Check if we're over a drop zone
         const beforeZone = elements.find(el => el.getAttribute('data-zone') === 'before');
@@ -178,15 +205,6 @@ export default function Home() {
         setActiveDropZone(null);
         draggedPosition.current = null;
     }, [isDragging, handleDrop]);
-
-    // Clean up scroll interval on unmount
-    useEffect(() => {
-        return () => {
-            if (scrollIntervalRef.current) {
-                clearInterval(scrollIntervalRef.current);
-            }
-        };
-    }, []);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
