@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { historicalEvents, GRANDPA_BIRTH_YEAR } from '../data/events';
 import type { HistoricalEvent, QuizState, DropZone } from '../types';
 import DroppedEvent from '../components/DroppedEvent';
@@ -21,6 +21,10 @@ export default function Home() {
         before: [],
         during: [],
     });
+
+    const [isDragging, setIsDragging] = useState(false);
+    const draggedPosition = useRef<{ x: number; y: number } | null>(null);
+    const currentEventRef = useRef<HTMLDivElement>(null);
 
     const currentEvent = quizState.events[quizState.currentEventIndex];
     const totalCorrect = Object.values(quizState.answers).filter(Boolean).length;
@@ -52,14 +56,52 @@ export default function Home() {
             currentEventIndex: newIndex,
             isComplete,
         });
+        setIsDragging(false);
     }, [currentEvent, droppedEvents, quizState]);
+
+    const handleTouchStart = useCallback((e: React.TouchEvent) => {
+        const touch = e.touches[0];
+        draggedPosition.current = { x: touch.clientX, y: touch.clientY };
+        setIsDragging(true);
+    }, []);
+
+    const handleTouchMove = useCallback((e: React.TouchEvent) => {
+        if (!isDragging || !currentEventRef.current) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - (draggedPosition.current?.x || 0);
+        const deltaY = touch.clientY - (draggedPosition.current?.y || 0);
+        currentEventRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
+    }, [isDragging]);
+
+    const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+        if (!isDragging || !currentEventRef.current) return;
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+
+        // Reset the transform
+        currentEventRef.current.style.transform = '';
+
+        // Check if we're over a drop zone
+        const beforeZone = elements.find(el => el.getAttribute('data-zone') === 'before');
+        const duringZone = elements.find(el => el.getAttribute('data-zone') === 'during');
+
+        if (beforeZone) {
+            handleDrop('before');
+        } else if (duringZone) {
+            handleDrop('during');
+        }
+
+        setIsDragging(false);
+        draggedPosition.current = null;
+    }, [isDragging, handleDrop]);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
     }, []);
 
     const createShareText = useCallback(() => {
-        // Combine both arrays and sort by event ID to get chronological order
         const allResults = [...droppedEvents.before, ...droppedEvents.during]
             .sort((a, b) => parseInt(a.event.id) - parseInt(b.event.id));
 
@@ -134,8 +176,14 @@ export default function Home() {
 
             {currentEvent && !quizState.answers[currentEvent.id] && (
                 <div
+                    ref={currentEventRef}
                     draggable
-                    className="bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move"
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform ${isDragging ? 'z-50' : ''
+                        }`}
+                    style={{ touchAction: 'none' }}
                 >
                     <p className="text-lg text-center">{currentEvent.description}</p>
                 </div>
@@ -143,6 +191,7 @@ export default function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
                 <div
+                    data-zone="before"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('before')}
                     className="border-4 border-dashed p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white"
@@ -160,6 +209,7 @@ export default function Home() {
                 </div>
 
                 <div
+                    data-zone="during"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('during')}
                     className="border-4 border-dashed p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white"
