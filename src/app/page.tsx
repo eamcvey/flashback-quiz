@@ -199,7 +199,7 @@ export default function Home() {
         const resultEmojis = allResults.map(item => item.isCorrect ? '🟩' : '🟥').join('');
         const totalCorrect = allResults.filter(item => item.isCorrect).length;
 
-        return `I completed Grandpa's Birthday Flashback Quiz!\n${resultEmojis}\n${totalCorrect}/${historicalEvents.length} correct!\nCan you beat my score?`;
+        return `I completed Grandpa's Birthday Flashback Quiz!\n${resultEmojis}\n${totalCorrect}/${historicalEvents.length} correct!\nCan you beat my score?\nhttps://flashback-quiz.vercel.app`;
     }, [droppedEvents]);
 
     const shareResults = useCallback(() => {
