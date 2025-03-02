@@ -218,13 +218,13 @@ export default function Home() {
         return (
             <div className="min-h-screen flex flex-col items-center p-4 bg-amber-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-md w-full mb-8">
-                    <h2 className="text-2xl font-bold mb-4">Quiz Complete!</h2>
-                    <p className="text-lg mb-4">
+                    <h2 className="text-2xl font-bold mb-4 font-fredoka">Quiz Complete!</h2>
+                    <p className="text-lg mb-4 font-outfit">
                         You got {totalCorrect} out of {quizState.events.length} correct!
                     </p>
                     <button
                         onClick={shareResults}
-                        className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        className="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors font-outfit"
                     >
                         Share Results
                     </button>
@@ -232,7 +232,7 @@ export default function Home() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">
                     <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4 text-center">Before Grandpa was born</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-center font-fredoka">Before Grandpa was born</h3>
                         <div className="space-y-4">
                             {droppedEvents.before.map((item) => (
                                 <DroppedEvent
@@ -245,7 +245,7 @@ export default function Home() {
                     </div>
 
                     <div className="bg-white p-4 rounded-lg shadow-lg">
-                        <h3 className="text-lg font-semibold mb-4 text-center">In Grandpa's lifetime</h3>
+                        <h3 className="text-lg font-semibold mb-4 text-center font-fredoka">In Grandpa's lifetime</h3>
                         <div className="space-y-4">
                             {droppedEvents.during.map((item) => (
                                 <DroppedEvent
@@ -263,18 +263,18 @@ export default function Home() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-amber-50">
-            <h1 className="text-3xl font-bold mb-8 text-center text-amber-900">Grandpa's Birthday Flashback Quiz</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center text-amber-900 font-fredoka">Grandpa's Birthday Flashback Quiz</h1>
 
             {currentEvent && !quizState.answers[currentEvent.id] && (
                 <>
-                    <p className="text-lg text-center mb-4 text-amber-800">Drag this event into the correct Grandpa Era!</p>
+                    <p className="text-lg text-center mb-4 text-amber-800 font-outfit">Drag this event into the correct Grandpa Era!</p>
                     <div
                         ref={currentEventRef}
                         draggable
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg select-none ${isDragging ? 'z-50 shadow-xl' : ''
+                        className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg select-none font-outfit ${isDragging ? 'z-50 shadow-xl' : ''
                             }`}
                         style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
                     >
@@ -290,7 +290,7 @@ export default function Home() {
                     onDrop={() => handleDrop('before')}
                     className={`border-4 ${activeDropZone === 'before' ? 'border-solid border-blue-500' : 'border-dashed'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
-                    <p className="text-center text-lg font-medium mb-4">
+                    <p className="text-center text-lg font-medium mb-4 font-fredoka">
                         Before Grandpa was born
                     </p>
                     {droppedEvents.before.map((item) => (
@@ -308,7 +308,7 @@ export default function Home() {
                     onDrop={() => handleDrop('during')}
                     className={`border-4 ${activeDropZone === 'during' ? 'border-solid border-blue-500' : 'border-dashed'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
-                    <p className="text-center text-lg font-medium mb-4">
+                    <p className="text-center text-lg font-medium mb-4 font-fredoka">
                         In Grandpa's lifetime
                     </p>
                     {droppedEvents.during.map((item) => (
@@ -322,7 +322,7 @@ export default function Home() {
             </div>
 
             <div className="mt-8 text-center">
-                <p className="text-gray-600">
+                <p className="text-gray-600 font-outfit">
                     Event {quizState.currentEventIndex + 1} of {quizState.events.length}
                 </p>
             </div>
