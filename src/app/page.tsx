@@ -183,11 +183,11 @@ export default function Home() {
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
                         onTouchEnd={handleTouchEnd}
-                        className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg ${isDragging ? 'z-50 shadow-xl' : ''
+                        className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg select-none ${isDragging ? 'z-50 shadow-xl' : ''
                             }`}
-                        style={{ touchAction: 'none' }}
+                        style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none' }}
                     >
-                        <p className="text-lg text-center">{currentEvent.description}</p>
+                        <p className="text-lg text-center select-none">{currentEvent.description}</p>
                     </div>
                 </>
             )}
