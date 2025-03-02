@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-import { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { historicalEvents, GRANDPA_BIRTH_YEAR } from '../data/events';
 import type { HistoricalEvent, QuizState, DropZone } from '../types';
 import DroppedEvent from '../components/DroppedEvent';
@@ -26,6 +25,8 @@ export default function Home() {
     const [isDragging, setIsDragging] = useState(false);
     const draggedPosition = useRef<{ x: number; y: number } | null>(null);
     const currentEventRef = useRef<HTMLDivElement>(null);
+    const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+    const [activeDropZone, setActiveDropZone] = useState<DropZone | null>(null);
 
     const currentEvent = quizState.events[quizState.currentEventIndex];
     const totalCorrect = Object.values(quizState.answers).filter(Boolean).length;
@@ -66,6 +67,36 @@ export default function Home() {
         setIsDragging(true);
     }, []);
 
+    const handleScroll = useCallback((touch: { clientY: number }) => {
+        const SCROLL_THRESHOLD = 150; // pixels from edge to start scrolling
+        const SCROLL_SPEED = 10;
+        const windowHeight = window.innerHeight;
+        const scrollY = window.scrollY;
+        const maxScroll = document.documentElement.scrollHeight - windowHeight;
+
+        if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+        }
+
+        if (touch.clientY < SCROLL_THRESHOLD && scrollY > 0) {
+            // Scroll up
+            scrollIntervalRef.current = setInterval(() => {
+                window.scrollBy(0, -SCROLL_SPEED);
+                if (window.scrollY <= 0) {
+                    clearInterval(scrollIntervalRef.current!);
+                }
+            }, 16);
+        } else if (touch.clientY > windowHeight - SCROLL_THRESHOLD && scrollY < maxScroll) {
+            // Scroll down
+            scrollIntervalRef.current = setInterval(() => {
+                window.scrollBy(0, SCROLL_SPEED);
+                if (window.scrollY >= maxScroll) {
+                    clearInterval(scrollIntervalRef.current!);
+                }
+            }, 16);
+        }
+    }, []);
+
     const handleTouchMove = useCallback((e: React.TouchEvent) => {
         if (!isDragging || !currentEventRef.current) return;
         e.preventDefault();
@@ -73,11 +104,33 @@ export default function Home() {
         const deltaX = touch.clientX - (draggedPosition.current?.x || 0);
         const deltaY = touch.clientY - (draggedPosition.current?.y || 0);
         currentEventRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-    }, [isDragging]);
+
+        // Handle scrolling
+        handleScroll(touch);
+
+        // Update active drop zone
+        const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
+        const beforeZone = elements.find(el => el.getAttribute('data-zone') === 'before');
+        const duringZone = elements.find(el => el.getAttribute('data-zone') === 'during');
+
+        if (beforeZone) {
+            setActiveDropZone('before');
+        } else if (duringZone) {
+            setActiveDropZone('during');
+        } else {
+            setActiveDropZone(null);
+        }
+    }, [isDragging, handleScroll]);
 
     const handleTouchEnd = useCallback((e: React.TouchEvent) => {
         if (!isDragging || !currentEventRef.current) return;
         e.preventDefault();
+
+        // Clear scroll interval if it exists
+        if (scrollIntervalRef.current) {
+            clearInterval(scrollIntervalRef.current);
+        }
+
         const touch = e.changedTouches[0];
         const elements = document.elementsFromPoint(touch.clientX, touch.clientY);
 
@@ -95,8 +148,18 @@ export default function Home() {
         }
 
         setIsDragging(false);
+        setActiveDropZone(null);
         draggedPosition.current = null;
     }, [isDragging, handleDrop]);
+
+    // Clean up scroll interval on unmount
+    useEffect(() => {
+        return () => {
+            if (scrollIntervalRef.current) {
+                clearInterval(scrollIntervalRef.current);
+            }
+        };
+    }, []);
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
         e.preventDefault();
@@ -198,7 +261,7 @@ export default function Home() {
                     data-zone="before"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('before')}
-                    className="border-4 border-dashed p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white"
+                    className={`border-4 ${activeDropZone === 'before' ? 'border-solid border-blue-500' : 'border-dashed'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
                     <p className="text-center text-lg font-medium mb-4">
                         Before Grandpa was born
@@ -216,7 +279,7 @@ export default function Home() {
                     data-zone="during"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('during')}
-                    className="border-4 border-dashed p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white"
+                    className={`border-4 ${activeDropZone === 'during' ? 'border-solid border-blue-500' : 'border-dashed'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
                     <p className="text-center text-lg font-medium mb-4">
                         In Grandpa's lifetime
