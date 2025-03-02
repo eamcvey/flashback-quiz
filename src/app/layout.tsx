@@ -35,7 +35,7 @@ export default function RootLayout({
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
             </head>
-            <body className={`${inter.className} ${lato.className} ${fredoka.className} ${outfit.className} bg-amber-50`}>
+            <body className={`${inter.className} ${lato.className} ${fredoka.className} ${outfit.className} bg-stone-100`}>
                 <main className={`min-h-screen`}>
                     {children}
                 </main>

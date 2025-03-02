@@ -263,7 +263,7 @@ export default function Home() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-stone-100">
-            <h1 className="text-3xl font-bold mb-8 text-center text-stone-800 font-fredoka">Grandpa's Birthday Flashback Quiz</h1>
+            <h1 className="text-3xl font-bold mb-8 text-center text-stone-800 font-fredoka">Grandpa's Birthday Flashback Quiz 🎂</h1>
 
             {currentEvent && !quizState.answers[currentEvent.id] && (
                 <>
@@ -288,7 +288,7 @@ export default function Home() {
                     data-zone="before"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('before')}
-                    className={`border-4 ${activeDropZone === 'before' ? 'border-solid border-emerald-600' : 'border-dashed border-stone-300'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
+                    className={`border-4 ${activeDropZone === 'before' ? 'border-solid border-stone-600' : 'border-dashed border-stone-300'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
                     <p className="text-center text-lg font-medium mb-4 font-fredoka text-stone-800">
                         Before Grandpa was born
@@ -306,7 +306,7 @@ export default function Home() {
                     data-zone="during"
                     onDragOver={handleDragOver}
                     onDrop={() => handleDrop('during')}
-                    className={`border-4 ${activeDropZone === 'during' ? 'border-solid border-emerald-600' : 'border-dashed border-stone-300'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
+                    className={`border-4 ${activeDropZone === 'during' ? 'border-solid border-stone-600' : 'border-dashed border-stone-300'} p-4 rounded-lg min-h-[200px] flex flex-col items-center bg-white transition-all duration-200`}
                 >
                     <p className="text-center text-lg font-medium mb-4 font-fredoka text-stone-800">
                         In Grandpa's lifetime
