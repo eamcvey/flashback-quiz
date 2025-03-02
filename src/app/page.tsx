@@ -125,7 +125,7 @@ export default function Home() {
 
     if (quizState.isComplete) {
         return (
-            <div className="min-h-screen flex flex-col items-center p-4 bg-gray-100">
+            <div className="min-h-screen flex flex-col items-center p-4 bg-amber-50">
                 <div className="bg-white p-6 rounded-lg shadow-lg text-center max-w-md w-full mb-8">
                     <h2 className="text-2xl font-bold mb-4">Quiz Complete!</h2>
                     <p className="text-lg mb-4">
@@ -171,22 +171,25 @@ export default function Home() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-gray-100">
-            <h1 className="text-2xl font-bold mb-8 text-center">Flashback Quiz</h1>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-amber-50">
+            <h1 className="text-3xl font-bold mb-8 text-center text-amber-900">Grandpa's Birthday Flashback Quiz</h1>
 
             {currentEvent && !quizState.answers[currentEvent.id] && (
-                <div
-                    ref={currentEventRef}
-                    draggable
-                    onTouchStart={handleTouchStart}
-                    onTouchMove={handleTouchMove}
-                    onTouchEnd={handleTouchEnd}
-                    className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform ${isDragging ? 'z-50' : ''
-                        }`}
-                    style={{ touchAction: 'none' }}
-                >
-                    <p className="text-lg text-center">{currentEvent.description}</p>
-                </div>
+                <>
+                    <p className="text-lg text-center mb-4 text-amber-800">Drag this event into the correct Grandpa Era!</p>
+                    <div
+                        ref={currentEventRef}
+                        draggable
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                        className={`bg-white p-4 rounded-lg shadow-md mb-8 w-full max-w-sm touch-manipulation cursor-move transition-transform hover:shadow-lg ${isDragging ? 'z-50 shadow-xl' : ''
+                            }`}
+                        style={{ touchAction: 'none' }}
+                    >
+                        <p className="text-lg text-center">{currentEvent.description}</p>
+                    </div>
+                </>
             )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-2xl">

@@ -1,9 +1,14 @@
 import React from 'react';
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Lato } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'] });
+const lato = Lato({
+    weight: ['400', '700'],
+    subsets: ['latin'],
+    display: 'swap',
+});
 
 export const metadata: Metadata = {
     title: 'Flashback Quiz',
@@ -20,7 +25,7 @@ export default function RootLayout({
             <head>
                 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
             </head>
-            <body className={inter.className}>{children}</body>
+            <body className={`${inter.className} ${lato.className} bg-amber-50`}>{children}</body>
         </html>
     );
 } 
