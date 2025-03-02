@@ -23,7 +23,7 @@ export default function Home() {
     });
 
     const [isDragging, setIsDragging] = useState(false);
-    const draggedPosition = useRef<{ x: number; y: number } | null>(null);
+    const draggedPosition = useRef<{ x: number; y: number; scrollY: number } | null>(null);
     const currentEventRef = useRef<HTMLDivElement>(null);
     const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
     const [activeDropZone, setActiveDropZone] = useState<DropZone | null>(null);
@@ -63,7 +63,11 @@ export default function Home() {
 
     const handleTouchStart = useCallback((e: React.TouchEvent) => {
         const touch = e.touches[0];
-        draggedPosition.current = { x: touch.clientX, y: touch.clientY };
+        draggedPosition.current = {
+            x: touch.clientX,
+            y: touch.clientY,
+            scrollY: window.scrollY
+        };
         setIsDragging(true);
     }, []);
 
@@ -98,11 +102,15 @@ export default function Home() {
     }, []);
 
     const handleTouchMove = useCallback((e: React.TouchEvent) => {
-        if (!isDragging || !currentEventRef.current) return;
+        if (!isDragging || !currentEventRef.current || !draggedPosition.current) return;
         e.preventDefault();
         const touch = e.touches[0];
-        const deltaX = touch.clientX - (draggedPosition.current?.x || 0);
-        const deltaY = touch.clientY - (draggedPosition.current?.y || 0);
+
+        // Calculate the total movement including scroll
+        const deltaX = touch.clientX - draggedPosition.current.x;
+        const deltaY = (touch.clientY - draggedPosition.current.y) +
+            (window.scrollY - draggedPosition.current.scrollY);
+
         currentEventRef.current.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
 
         // Handle scrolling
